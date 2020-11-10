@@ -111,6 +111,8 @@
                 rect2X: [ 0, 0, { start: 0, end: 0} ],
                 blendHeight: [ 0, 0, { start: 0, end: 0} ],
                 canvas_scale: [ 0, 0, { start: 0, end: 0} ],
+                canvasCaption_opacity: [ 0, 1, { start: 0, end: 0 } ],
+				canvasCaption_translateY: [ 20, 0, { start: 0, end: 0 } ],
                 rectStartY: 0
             }
         }
@@ -140,6 +142,16 @@
         }
         console.log(sceneInfo[3].objs.images);
     }
+    setCanvasImages();
+
+    function checkMenu() {
+        if (yOffset > 44) {
+            document.body.classList.add('local-nav-sticky');
+        } else {
+            document.body.classList.remove('local-nav-sticky');
+        }
+    }
+
 
     function setLayout() {
         // 각 스크롤 섹션의 높이 세팅
@@ -434,7 +446,7 @@
                     );
             
                     objs.canvas.classList.add('sticky');
-                    objs.canvas.style.top = `${-(objs.canvas.height - objs.canvas.height * canvasScaleRatio / 2)}px`;
+                    objs.canvas.style.top = `${-(objs.canvas.height - objs.canvas.height * canvasScaleRatio) / 2}px`;
 
                     if (scrollRatio > values.blendHeight[2].end) {
                         values.canvas_scale[0] = canvasScaleRatio;
@@ -451,13 +463,14 @@
                         objs.canvas.classList.remove('sticky');
                         //scroll-section2에서 스크롤 된 만큼 margin-top을 준다.
                         objs.canvas.style.marginTop = `${scrollHeight * 0.4}px`;
-
+                        
                         values.canvasCaption_opacity[2].start = values.canvas_scale[2].end;
-						values.canvasCaption_opacity[2].end = values.canvasCaption_opacity[2].start + 0.1;
-						values.canvasCaption_translateY[2].start = values.canvasCaption_opacity[2].start;
-						values.canvasCaption_translateY[2].end = values.canvasCaption_opacity[2].end;
-						objs.canvasCaption.style.opacity = calcValues(values.canvasCaption_opacity, currentYOffset);
-						objs.canvasCaption.style.transform = `translate3d(0, ${calcValues(values.canvasCaption_translateY, currentYOffset)}%, 0)`;
+                        values.canvasCaption_opacity[2].end = values.canvasCaption_opacity[2].start + 0.1;
+                        values.canvasCaption_translateY[2].start = values.canvasCaption_opacity[2].start
+                        values.canvasCaption_translateY[2].end = values.canvasCaption_opacity[2].end
+                        objs.canvasCaption.style.opacity = calcValues(values.canvasCaption_opacity, currentYOffset);
+                        objs.canvasCaption.style.transform = `translate3d(0, ${calcValues
+                            (values.canvasCaption_opacity, currentYOffset)}%, 0)`
                     }
                 }
                 break;
@@ -467,6 +480,7 @@
     function scrollLoop() {
         enterNewScene = false;
         prevScrollHeight = 0;
+        
         for (let i = 0; i < currentScene; i++) {
             prevScrollHeight += sceneInfo[i].scrollHeight;
         }
@@ -489,6 +503,7 @@
     window.addEventListener('scroll', () => {
         yOffset = window.pageYOffset;
         scrollLoop();
+        checkMenu();
     });
     // window.addEventListener('DOMcontentLoaded', setLayout) 이미지가 업로드 되기 전에 실행
     window.addEventListener('load', () => {
@@ -496,6 +511,7 @@
         sceneInfo[0].objs.context.drawImage(sceneInfo[0].objs.videoImages[0], 0, 0);
     });
     window.addEventListener('resize', setLayout);
-    setCanvasImages();
 })();
+
+
 
