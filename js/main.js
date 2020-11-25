@@ -543,12 +543,23 @@
     });
     // window.addEventListener('DOMcontentLoaded', setLayout) 이미지가 업로드 되기 전에 실행
     window.addEventListener('load', () => {
+        document.body.classList.remove('before-load');
         setLayout();
         sceneInfo[0].objs.context.drawImage(sceneInfo[0].objs.videoImages[0], 0, 0);
     });
-    window.addEventListener('resize', setLayout);
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 900) {
+            setLayout();
+        }
+        sceneInfo[3].values.rectStartY = 0;
+    });
+    window.addEventListener('orientationchange', setLayout); //모바일에서 방향 바뀔때 리사이징(setLayout)해줌
+    document.querySelector('.loading').addEventListener('transitionend', (e) => {
+        document.body.removeChild(e.currentTarget);
+    });
 
     setCanvasImages();
+
 })();
 
 
