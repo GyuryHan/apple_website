@@ -488,8 +488,17 @@
         }
 
         if (delayedYOffset > prevScrollHeight + sceneInfo[currentScene].scrollHeight) {
+            document.body.classList.remove('scroll-effect-end');
+        }
+
+        if (delayedYOffset > prevScrollHeight + sceneInfo[currentScene].scrollHeight) {
             enterNewScene = true;
-            currentScene ++;
+            if (currentScene === sceneInfo.length - 1) {
+                document.body.classList.add('scroll-effect-end');
+            }
+            if (currentScene < sceneInfo.length - 1) {
+                currentScene ++;
+            }
             document.body.setAttribute('id', `show-scene-${currentScene}`);
 
         } if (delayedYOffset < prevScrollHeight) {
@@ -531,31 +540,58 @@
 
     // loop();
 
-    window.addEventListener('scroll', () => {
-        yOffset = window.pageYOffset;
-        scrollLoop();
-        checkMenu();
-
-        if (!rafState) {
-            rafId = requestAnimationFrame(loop);
-            rafState = true;
-        }
-    });
     // window.addEventListener('DOMcontentLoaded', setLayout) 이미지가 업로드 되기 전에 실행
     window.addEventListener('load', () => {
+
+        // debugger;
+
         document.body.classList.remove('before-load');
         setLayout();
         sceneInfo[0].objs.context.drawImage(sceneInfo[0].objs.videoImages[0], 0, 0);
-    });
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 900) {
-            setLayout();
-        }
-        sceneInfo[3].values.rectStartY = 0;
-    });
-    window.addEventListener('orientationchange', setLayout); //모바일에서 방향 바뀔때 리사이징(setLayout)해줌
-    document.querySelector('.loading').addEventListener('transitionend', (e) => {
-        document.body.removeChild(e.currentTarget);
+       
+        let tempYOffset = yOffset;
+        let tempScrollCount = 0;
+
+        if (yOffset > 0) {
+            let siId = setInterval(() => {
+                window.scrollTo(0, tempYOffset);
+                tempYOffset += 5;
+                
+                if (tempScrollCount > 20) {
+                    clearInterval(siId);
+                }
+                tempScrollCount ++;
+            }, 20)
+         }
+      // 스크롤이 안되면 캔버스가 안그려지기 때문에 자동으로 스크롤 그려줌 
+        
+        window.addEventListener('scroll', () => {
+            yOffset = window.pageYOffset;
+            scrollLoop();
+            checkMenu();
+    
+            if (!rafState) {
+                rafId = requestAnimationFrame(loop);
+                rafState = true;
+            }
+        });    
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 900) {
+                window.location.reload();
+            }
+        });
+
+        window.addEventListener('orientationchange', () => {
+            scrollTo(0, 0);
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        }); //모바일에서 방향 바뀔때 리사이징(setLayout)해줌
+    
+        document.querySelector('.loading').addEventListener('transitionend', (e) => {
+            document.body.removeChild(e.currentTarget);
+        });
     });
 
     setCanvasImages();
